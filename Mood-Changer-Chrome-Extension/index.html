@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EmoUI</title>
+    <!-- Add Google Font 'Outfit' for modern typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="icon" href="/icon128.png" type="image/png" />
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <!-- Premium animated background layer -->
+    <div class="glow-bg"></div>
+
+    <div id="app">
+      <header>
+        <div class="header-content">
+          <h1>EmoUI</h1>
+          <div id="mood-badge" class="badge active">Detecting...</div>
+        </div>
+        <p class="subtitle">Your intelligent emotional ambient companion</p>
+      </header>
+
+      <main>
+        <div class="glass-card">
+          <div class="icon-ring">
+            <div id="mood-icon">✨</div>
+          </div>
+          
+          <div class="mood-info">
+            <div id="mood-label">Waiting to start...</div>
+            <div id="message-container" class="hidden">
+              <p id="soothing-message"></p>
+            </div>
+          </div>
+        </div>
+
+        <div class="controls glass-panel">
+          <h3>Settings</h3>
+          <div class="setting-row">
+            <label for="intervalSelect">Detection Interval:</label>
+            <select id="intervalSelect" class="modern-select">
+              <option value="0.5">30 Seconds (Test)</option>
+              <option value="1">1 Minute</option>
+              <option value="5">5 Minutes</option>
+              <option value="15">15 Minutes</option>
+              <option value="30">30 Minutes</option>
+            </select>
+          </div>
+          <div class="setting-row">
+            <label for="musicSelect">Music Prompt:</label>
+            <select id="musicSelect" class="modern-select">
+              <option value="yes">Enabled</option>
+              <option value="no">Disabled</option>
+            </select>
+          </div>
+          <p class="tiny-note">Fix OS Do Not Disturb if no notifications.</p>
+
+          <div id="musicPlayerWrapper" class="music-player hidden">
+             <h4>Now Playing</h4>
+             <p id="nowPlayingText" class="tiny-note" style="margin-bottom: 0.5rem; font-size: 0.8rem; color: #4ade80;">Soothing Music</p>
+             <div class="action-buttons" style="margin-bottom: 0.5rem;">
+                <button id="stopMusicBtn" class="btn outline" style="padding:0.5rem; border-color: #fca5a5; color: #fca5a5;">Stop Music</button>
+             </div>
+          </div>
+
+          <div class="action-buttons">
+              <button id="startBtn" class="btn primary">Let's Begin</button>
+              <button id="stopBtn" class="btn outline hidden">Stop</button>
+          </div>
+        </div>
+      </main>
+
+      <footer>
+        <div class="status-indicator">
+          <span id="status-dot"></span>
+          <span id="statusText">Status: Inactive</span>
+        </div>
+      </footer>
+    </div>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
