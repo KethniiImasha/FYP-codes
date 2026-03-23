@@ -1,0 +1,33 @@
+{
+  "manifest_version": 3,
+  "name": "EmoUI",
+  "version": "1.0",
+  "icons": {
+    "128": "icon128.png"
+  },
+  "permissions": ["offscreen", "scripting", "activeTab", "notifications", "storage"],
+  "action": { "default_popup": "index.html" },
+  "background": { "service_worker": "assets/background.js" },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["assets/content.js"]
+    }
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "assets/ort-wasm.wasm",
+        "assets/ort-wasm-simd.wasm",
+        "assets/ort-wasm-threaded.wasm",
+        "assets/ort-wasm-simd-threaded.wasm",
+        "models/yolov11n-emotion.onnx",
+        "offscreen.html"
+      ],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}
