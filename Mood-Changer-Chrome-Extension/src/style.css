@@ -1,0 +1,317 @@
+:root {
+  --text-main: #ffffff;
+  --text-muted: rgba(255, 255, 255, 0.7);
+  --primary: rgba(255, 255, 255, 0.15);
+  --primary-hover: rgba(255, 255, 255, 0.25);
+  
+  --glass-bg: rgba(20, 20, 20, 0.35);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+
+  /* Premium Gradients per Mood */
+  --mood-positive: linear-gradient(135deg, #FFB75E 0%, #ED8F03 100%);
+  --mood-negative: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  --mood-neutral: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);
+
+  --current-mood-bg: var(--mood-neutral);
+
+  font-family: 'Outfit', -apple-system, sans-serif;
+}
+
+body {
+  margin: 0;
+  width: 360px;
+  height: 550px;
+  background-color: #0f0f0f;
+  color: var(--text-main);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Animated animated background */
+.glow-bg {
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: var(--current-mood-bg);
+  opacity: 0.6;
+  filter: blur(100px);
+  z-index: 0;
+  animation: rotateGlow 20s linear infinite;
+  transition: background 1s ease-in-out;
+}
+
+@keyframes rotateGlow {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+#app {
+  width: 100%;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  z-index: 1;
+  position: relative;
+  box-sizing: border-box;
+}
+
+header {
+  text-align: center;
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.25rem;
+}
+
+h1 {
+  font-size: 1.5rem;
+  margin: 0;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  background: linear-gradient(to right, #fff, rgba(255,255,255,0.7));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.subtitle {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin: 0;
+  text-align: left;
+}
+
+.badge {
+  display: inline-block;
+  padding: 0.3rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: white;
+  backdrop-filter: blur(10px);
+}
+
+.badge.active {
+  box-shadow: 0 0 10px rgba(255,255,255,0.2);
+}
+
+.glass-card, .glass-panel {
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  box-shadow: var(--glass-shadow);
+  padding: 1rem;
+}
+
+.glass-card {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1rem;
+  text-align: left;
+}
+
+.icon-ring {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: inset 0 0 20px rgba(255,255,255,0.05);
+  flex-shrink: 0;
+}
+
+#mood-icon {
+  font-size: 2.2rem;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.2));
+  animation: float 4s ease-in-out infinite;
+}
+
+.mood-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+#mood-label {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: white;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+#message-container {
+  margin-top: 0.3rem;
+  padding: 0.5rem 0.75rem;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.05);
+  animation: fadeIn 0.5s ease-out;
+}
+
+#soothing-message {
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.9);
+  font-style: italic;
+  margin: 0;
+  line-height: 1.3;
+}
+
+.controls h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: white;
+}
+
+.setting-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.4rem;
+}
+
+.setting-row label {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.modern-select {
+  background: rgba(0,0,0,0.3);
+  color: white;
+  border: 1px solid rgba(255,255,255,0.1);
+  padding: 0.4rem 0.6rem;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 0.85rem;
+  outline: none;
+  cursor: pointer;
+}
+
+.modern-select option {
+  background: #1a1a1a;
+  color: white;
+}
+
+.tiny-note {
+  font-size: 0.65rem;
+  color: rgba(255,255,255,0.4);
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  line-height: 1.2;
+}
+
+.music-player {
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+.music-player h4 {
+  margin: 0 0 0.4rem 0;
+  font-size: 0.85rem;
+  color: white;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btn {
+  flex: 1;
+  padding: 0.75rem;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: none;
+  font-family: inherit;
+}
+
+.btn.primary {
+  background: rgba(255, 255, 255, 0.9);
+  color: #000;
+  box-shadow: 0 4px 15px rgba(255,255,255,0.2);
+}
+
+.btn.primary:hover {
+  background: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255,255,255,0.3);
+}
+
+.btn.outline {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border: 1px solid rgba(255,255,255,0.2);
+}
+
+.btn.outline:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+footer {
+  text-align: center;
+}
+
+.status-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(0,0,0,0.3);
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  border: 1px solid rgba(255,255,255,0.05);
+}
+
+#status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #666;
+  transition: background 0.3s ease;
+}
+
+.active-dot {
+  background: #4ade80 !important;
+  box-shadow: 0 0 10px #4ade80;
+}
+
+#statusText {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.hidden {
+  display: none !important;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px) scale(1.05); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
