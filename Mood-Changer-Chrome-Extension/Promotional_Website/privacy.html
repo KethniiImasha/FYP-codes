@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy — EmoUI</title>
+    <meta name="description" content="Privacy Policy for EmoUI Chrome Extension. Learn how EmoUI handles your camera data, API keys, and personal information.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0d0f17;
+            --text-primary: #ffffff;
+            --text-secondary: #94a3b8;
+            --primary: #6366f1;
+            --gradient-1: #3b82f6;
+            --gradient-2: #8b5cf6;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Outfit", sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            margin-bottom: 2rem;
+            transition: opacity 0.3s;
+        }
+
+        .back-link:hover {
+            opacity: 0.8;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+
+        .last-updated {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 3rem;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-top: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--gradient-2);
+        }
+
+        p, li {
+            color: var(--text-secondary);
+            line-height: 1.8;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        strong {
+            color: var(--text-primary);
+        }
+
+        ul {
+            padding-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        .highlight-box {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .highlight-box p {
+            margin-bottom: 0;
+        }
+
+        footer {
+            margin-top: 4rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--glass-border);
+            text-align: center;
+            color: rgba(148, 163, 184, 0.5);
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="back-link">← Back to EmoUI</a>
+
+        <h1>Privacy Policy</h1>
+        <p class="last-updated">Last updated: April 23, 2026</p>
+
+        <p>EmoUI ("the Extension") is a Chrome extension that uses on-device artificial intelligence to detect your emotional state via your webcam and enhance your browsing experience. This privacy policy explains how EmoUI handles your data.</p>
+
+        <div class="highlight-box">
+            <p><strong>Summary:</strong> EmoUI processes all camera data locally on your device. We collect zero personal data. No images, video, or facial data ever leave your computer.</p>
+        </div>
+
+        <h2>1. Information We Collect</h2>
+        <p>EmoUI does <strong>not</strong> collect, store, or transmit any personal information. Specifically:</p>
+        <ul>
+            <li><strong>Camera Data:</strong> Your webcam feed is processed entirely on-device using ONNX Runtime Web (WebAssembly). Video frames are analyzed in memory for mood detection and are immediately discarded. No images, video frames, facial data, or biometric information are ever stored, transmitted, or logged.</li>
+            <li><strong>Mood Data:</strong> Detected mood readings (e.g., "positive", "negative", "neutral") exist only in the extension's volatile runtime memory and are not persisted or transmitted.</li>
+            <li><strong>Browsing Data:</strong> EmoUI does not access, monitor, or collect any browsing history, page content, URLs, or cookies.</li>
+            <li><strong>Analytics:</strong> EmoUI does not use any analytics, telemetry, tracking scripts, or third-party monitoring services.</li>
+        </ul>
+
+        <h2>2. Information You Provide</h2>
+        <p>The following information is optionally provided by you and stored locally:</p>
+        <ul>
+            <li><strong>OpenAI API Key:</strong> If you choose to enable AI-powered quotes, you may enter your OpenAI API key. This key is stored exclusively in your browser's local storage (<code>chrome.storage.local</code>) and is never shared with EmoUI's developers or any third party. The key is sent only to OpenAI's servers (api.openai.com) when generating motivational quotes.</li>
+            <li><strong>Settings:</strong> Your preferences (detection interval, language, music preference) are stored locally in your browser using Chrome's storage API. These settings never leave your device.</li>
+        </ul>
+
+        <h2>3. Third-Party Services</h2>
+        <p>EmoUI makes external network requests only in the following scenario:</p>
+        <ul>
+            <li><strong>OpenAI API (optional):</strong> If you have provided an OpenAI API key, the extension sends a short text prompt (e.g., "Generate a soothing quote for someone feeling sad") to the OpenAI Chat Completions API. This request includes your API key and the text prompt only. No camera data, personal information, facial data, or browsing data is included in this request. OpenAI's use of this data is governed by <a href="https://openai.com/policies/privacy-policy" style="color: var(--primary);">OpenAI's Privacy Policy</a>.</li>
+        </ul>
+        <p>If no API key is provided, EmoUI operates entirely offline and makes zero network requests.</p>
+
+        <h2>4. Permissions Justification</h2>
+        <p>EmoUI requests the following Chrome permissions:</p>
+        <ul>
+            <li><strong>offscreen:</strong> Required to create an offscreen document that accesses the webcam for mood detection. This runs in the background without interrupting your browsing experience.</li>
+            <li><strong>notifications:</strong> Used to display mood-based notifications and soothing music suggestions through Chrome's native notification system.</li>
+            <li><strong>storage:</strong> Used to persist your user preferences (detection interval, language, API key) locally within your browser.</li>
+        </ul>
+
+        <h2>5. Data Security</h2>
+        <p>Since all AI processing occurs on-device and no personal data is collected or transmitted, there is no centralized data store to protect. Your OpenAI API key is stored in Chrome's sandboxed local storage, which is isolated from other extensions and websites.</p>
+
+        <h2>6. Children's Privacy</h2>
+        <p>EmoUI is not directed at children under the age of 13. We do not knowingly collect any personal information from children.</p>
+
+        <h2>7. Changes to This Policy</h2>
+        <p>We may update this privacy policy from time to time. Any changes will be reflected on this page with an updated "Last updated" date. Continued use of the Extension after changes constitutes acceptance of the updated policy.</p>
+
+        <h2>8. Contact</h2>
+        <p>If you have any questions or concerns about this privacy policy, please contact us via:</p>
+        <ul>
+            <li>Our <a href="https://github.com/Dinuk-Di/Mood-Changer-Chrome-Extension" style="color: var(--primary);">GitHub Repository</a></li>
+            <li>The Chrome Web Store listing for EmoUI</li>
+        </ul>
+
+        <footer>
+            <p>© 2026 EmoUI. All rights reserved.</p>
+        </footer>
+    </div>
+</body>
+</html>
