@@ -205,6 +205,22 @@ h1 {
   cursor: pointer;
 }
 
+.modern-input {
+  background: rgba(0,0,0,0.3);
+  color: white;
+  border: 1px solid rgba(255,255,255,0.1);
+  padding: 0.4rem 0.6rem;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 0.85rem;
+  outline: none;
+  width: 120px;
+}
+
+.modern-input:focus {
+  border-color: rgba(255,255,255,0.3);
+}
+
 .modern-select option {
   background: #1a1a1a;
   color: white;
@@ -294,6 +310,11 @@ footer {
 .active-dot {
   background: #4ade80 !important;
   box-shadow: 0 0 10px #4ade80;
+}
+
+.paused-dot {
+  background: #facc15 !important;
+  box-shadow: 0 0 10px #facc15;
 }
 
 #statusText {

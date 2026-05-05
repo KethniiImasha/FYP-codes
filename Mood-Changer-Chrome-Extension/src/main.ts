@@ -1,4 +1,12 @@
-// 1. DOM Elements
+// Error Logging
+window.addEventListener("error", (e) => {
+    console.error("[EmoUI Popup Error]", e.error || e.message);
+});
+window.addEventListener("unhandledrejection", (e) => {
+    console.error("[EmoUI Popup Promise Error]", e.reason);
+});
+
+// 1. DOM Elements 
 const startBtn = document.getElementById("startBtn") as HTMLButtonElement;
 const stopBtn = document.getElementById("stopBtn") as HTMLButtonElement;
 const statusText = document.getElementById("statusText") as HTMLSpanElement;
@@ -10,6 +18,8 @@ const messageContainer = document.getElementById("message-container") as HTMLDiv
 const soothingMessage = document.getElementById("soothing-message") as HTMLParagraphElement;
 const intervalSelect = document.getElementById("intervalSelect") as HTMLSelectElement;
 const musicSelect = document.getElementById("musicSelect") as HTMLSelectElement;
+const languageSelect = document.getElementById("languageSelect") as HTMLSelectElement;
+const apiKeyInput = document.getElementById("apiKeyInput") as HTMLInputElement;
 const musicPlayerWrapper = document.getElementById("musicPlayerWrapper") as HTMLDivElement;
 const stopMusicBtn = document.getElementById("stopMusicBtn") as HTMLButtonElement;
 
@@ -51,8 +61,8 @@ const MOOD_CONFIG: Record<
   },
 };
 
-// 3. Storage & Settings
-chrome.storage.local.get(["detectionInterval", "musicEnabled", "musicIsPlaying"], (res) => {
+// 3. Storage & Settings 
+chrome.storage.local.get(["detectionInterval", "musicEnabled", "musicIsPlaying", "quoteLanguage", "openaiApiKey"], (res) => {
     if (res.detectionInterval && typeof res.detectionInterval === 'string') {
         intervalSelect.value = res.detectionInterval;
     }
@@ -60,6 +70,12 @@ chrome.storage.local.get(["detectionInterval", "musicEnabled", "musicIsPlaying"]
         musicSelect.value = res.musicEnabled;
     } else {
         musicSelect.value = "yes"; // Default
+    }
+    if (res.quoteLanguage && typeof res.quoteLanguage === 'string') {
+        languageSelect.value = res.quoteLanguage;
+    }
+    if (res.openaiApiKey && typeof res.openaiApiKey === 'string') {
+        apiKeyInput.value = res.openaiApiKey;
     }
     if (res.musicIsPlaying) {
         musicPlayerWrapper.classList.remove("hidden");
@@ -69,13 +85,19 @@ chrome.storage.local.get(["detectionInterval", "musicEnabled", "musicIsPlaying"]
 });
 
 intervalSelect.addEventListener("change", () => {
-    const val = intervalSelect.value;
-    chrome.storage.local.set({ detectionInterval: val });
+    chrome.storage.local.set({ detectionInterval: intervalSelect.value });
 });
 
 musicSelect.addEventListener("change", () => {
-    const val = musicSelect.value;
-    chrome.storage.local.set({ musicEnabled: val });
+    chrome.storage.local.set({ musicEnabled: musicSelect.value });
+});
+
+languageSelect.addEventListener("change", () => {
+    chrome.storage.local.set({ quoteLanguage: languageSelect.value });
+});
+
+apiKeyInput.addEventListener("input", () => {
+    chrome.storage.local.set({ openaiApiKey: apiKeyInput.value.trim() });
 });
 
 stopMusicBtn.addEventListener("click", () => {
@@ -95,9 +117,9 @@ chrome.storage.onChanged.addListener((changes, area) => {
 });
 
 
-//4. UI Logic
+// 4. UI Logic 
 
-function updateMoodUI(mood: string) {
+function updateMoodUI(mood: string, quote?: string) {
   const config = MOOD_CONFIG[mood] || MOOD_CONFIG.neutral;
 
   // Update theme glow layer
@@ -112,9 +134,12 @@ function updateMoodUI(mood: string) {
 
   // Show soothing message for positive and negative moods
   if (["positive", "negative"].includes(mood)) {
-    const randomMsg =
-      config.messages[Math.floor(Math.random() * config.messages.length)];
-    soothingMessage.textContent = randomMsg;
+    if (quote) {
+      soothingMessage.textContent = quote;
+    } else {
+      // Fallback if API fails or no quote provided
+      soothingMessage.textContent = config.messages[Math.floor(Math.random() * config.messages.length)];
+    }
     messageContainer.classList.remove("hidden");
   } else {
     messageContainer.classList.add("hidden");
@@ -124,14 +149,25 @@ function updateMoodUI(mood: string) {
 function showRunningState() {
   statusText.textContent = "Status: Active";
   statusDot.classList.add("active-dot");
+  statusDot.classList.remove("paused-dot");
   startBtn.classList.add("hidden");
   stopBtn.classList.remove("hidden");
   moodBadge.textContent = "Detecting...";
 }
 
+function showPausedState() {
+  statusText.textContent = "Status: Paused";
+  statusDot.classList.remove("active-dot");
+  statusDot.classList.add("paused-dot");
+  startBtn.classList.add("hidden");
+  stopBtn.classList.remove("hidden");
+  moodBadge.textContent = "Paused";
+}
+
 function showStoppedState() {
   statusText.textContent = "Status: Inactive";
   statusDot.classList.remove("active-dot");
+  statusDot.classList.remove("paused-dot");
   startBtn.classList.remove("hidden");
   stopBtn.classList.add("hidden");
   moodBadge.textContent = "Offline";
@@ -148,21 +184,31 @@ function showStoppedState() {
 
 async function checkStatus() {
   try {
+    // Check if offscreen document exists (camera is running)
     const hasDoc = await chrome.offscreen.hasDocument();
+
     if (hasDoc) {
       showRunningState();
+      // Also fetch the current mood from background to show it
+      chrome.runtime.sendMessage({ type: "GET_MOOD" }, (response) => {
+        if (chrome.runtime.lastError) return;
+        if (response && response.mood && response.mood !== "neutral") {
+          updateMoodUI(response.mood, response.quote);
+        }
+      });
     } else {
       showStoppedState();
     }
   } catch (e: any) {
-    statusText.textContent = `Init Error: ${e.message}`;
+    // If hasDocument throws, extension is in an unknown state
+    showStoppedState();
+    console.error("[EmoUI Popup] checkStatus error:", e.message);
   }
 }
 
 startBtn.addEventListener("click", async () => {
   try {
     // Explicitly request camera permissions in the popup (user gesture)
-    // This is required, especially on macOS, to show the OS-level prompt
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
       stream.getTracks().forEach((t) => t.stop());
@@ -178,6 +224,8 @@ startBtn.addEventListener("click", async () => {
         justification: "To access webcam for mood detection",
       });
     }
+    // Tell background to reset state and start fresh
+    chrome.runtime.sendMessage({ type: "START_EXTENSION" }).catch(() => {});
     showRunningState();
   } catch (error: any) {
     statusText.textContent = `Error: ${error.message}`;
@@ -185,17 +233,37 @@ startBtn.addEventListener("click", async () => {
 });
 
 stopBtn.addEventListener("click", async () => {
+  // Immediately disable the stop button to prevent double-clicks
+  stopBtn.disabled = true;
+
   try {
-    await chrome.offscreen.closeDocument();
+    // Tell background to clean up state first
+    chrome.runtime.sendMessage({ type: "STOP_EXTENSION" }).catch(() => {});
+
+    const hasDoc = await chrome.offscreen.hasDocument();
+    if (hasDoc) {
+      await chrome.offscreen.closeDocument();
+      // Give Chrome a moment to fully tear down the offscreen document
+      await new Promise(resolve => setTimeout(resolve, 300));
+    }
     showStoppedState();
   } catch (error: any) {
-    statusText.textContent = `Error: ${error.message}`;
+    showStoppedState();
+    console.error("[EmoUI Popup] Stop error:", error.message);
+  } finally {
+    stopBtn.disabled = false;
   }
 });
 
 chrome.runtime.onMessage.addListener((msg) => {
   if (msg.type === "MOOD") {
-      updateMoodUI(msg.mood);
+      updateMoodUI(msg.mood, msg.quote);
+  } else if (msg.type === "PAUSED_STATE") {
+      if (msg.isPaused) {
+          showPausedState();
+      } else {
+          showRunningState();
+      }
   }
 });
 

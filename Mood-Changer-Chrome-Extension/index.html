@@ -46,8 +46,10 @@
           <div class="setting-row">
             <label for="intervalSelect">Detection Interval:</label>
             <select id="intervalSelect" class="modern-select">
-              <option value="0.5">30 Seconds (Test)</option>
-              <option value="1">1 Minute</option>
+              <option value="0.05">5 Seconds</option>
+              <option value="0.1">10 Seconds</option>
+              <option value="0.2">20 Seconds</option>
+              <option value="0.5">30 Seconds</option>
               <option value="5">5 Minutes</option>
               <option value="15">15 Minutes</option>
               <option value="30">30 Minutes</option>
@@ -59,6 +61,17 @@
               <option value="yes">Enabled</option>
               <option value="no">Disabled</option>
             </select>
+          </div>
+          <div class="setting-row">
+            <label for="languageSelect">Quote Language:</label>
+            <select id="languageSelect" class="modern-select">
+              <option value="english">English</option>
+              <option value="sinhala">Sinhala</option>
+            </select>
+          </div>
+          <div class="setting-row">
+            <label for="apiKeyInput">OpenAI API Key:</label>
+            <input type="password" id="apiKeyInput" class="modern-input" placeholder="sk-..." />
           </div>
           <p class="tiny-note">Fix OS Do Not Disturb if no notifications.</p>
 

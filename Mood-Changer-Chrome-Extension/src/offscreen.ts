@@ -1,8 +1,16 @@
 import * as ort from 'onnxruntime-web';
 
+// Error Logging
+window.addEventListener("error", (e) => {
+    console.error("[EmoUI Offscreen Error]", e.error || e.message);
+});
+window.addEventListener("unhandledrejection", (e) => {
+    console.error("[EmoUI Offscreen Promise Error]", e.reason);
+});
+
 // CONFIGURATION 
 ort.env.wasm.wasmPaths = chrome.runtime.getURL("assets/");
-ort.env.wasm.numThreads = 1; 
+ort.env.wasm.numThreads = 2; // Increased threads
 ort.env.wasm.proxy = false;
 
 // CONSTANTS
@@ -12,6 +20,7 @@ const EMOTION_SIZE = 128;
 let detectionSession: ort.InferenceSession | null = null;
 let emotionSession: ort.InferenceSession | null = null;
 let audioPlayer: HTMLAudioElement | null = null;
+let isPaused = false;
 
 async function init() {
     console.log("🚀 Init started...");
@@ -29,7 +38,7 @@ async function init() {
             options
         );
         
-        console.log(`✅ System Ready: Models Loaded`);
+        console.log(`System Ready: Models Loaded`);
 
         // Setup Audio Player
         audioPlayer = new Audio("https://cdn.pixabay.com/audio/2022/05/27/audio_1808fbf07a.mp3"); // placeholder soothing music
@@ -37,7 +46,7 @@ async function init() {
 
         startLoop();
     } catch (e: any) {
-        console.error("❌ Model Load Failed:", e.message || e);
+        console.error("Model Load Failed:", e.message || e);
     }
 }
 
@@ -51,16 +60,16 @@ async function startLoop() {
                 height: { ideal: DETECTION_SIZE } 
             } 
         });
-        console.log("✅ Camera access granted:", stream.active);
+        console.log("Camera access granted:", stream.active);
     } catch (e: any) {
-        console.error("❌ Camera Error:", e.message || e);
+        console.error("Camera Error:", e.message || e);
         return;
     }
     
     const track = stream.getVideoTracks()[0];
     
     if (!('ImageCapture' in window)) {
-        console.error("❌ ImageCapture API not supported in this browser version/context.");
+        console.error("ImageCapture API not supported in this browser version/context.");
         return;
     }
 
@@ -78,7 +87,7 @@ async function startLoop() {
     console.log("⏱️ Starting inference loop...");
     
     const runInference = async () => {
-        if (!detectionSession || !emotionSession) {
+        if (!detectionSession || !emotionSession || isPaused) {
             return;
         }
 
@@ -97,17 +106,23 @@ async function startLoop() {
             const detOutput = detResults.output0.data as Float32Array;
             const personBox = getBestPersonBox(detOutput, 8400); // returns [x, y, w, h] or null
             
-            if (personBox) {
+                if (personBox) {
                 // 2. Crop & Emotion Prediction
                 const cx = personBox[0];
                 const cy = personBox[1];
                 const w = personBox[2];
                 const h = personBox[3];
 
-                const x1 = Math.max(0, cx - w / 2);
-                const y1 = Math.max(0, cy - h / 2);
-                const cropW = Math.min(DETECTION_SIZE - x1, w);
-                const cropH = Math.min(DETECTION_SIZE - y1, h);
+                // Add 20% padding to improve emotion detection accuracy
+                const padW = w * 0.2;
+                const padH = h * 0.2;
+                const paddedW = w + padW;
+                const paddedH = h + padH;
+
+                const x1 = Math.max(0, cx - paddedW / 2);
+                const y1 = Math.max(0, cy - paddedH / 2);
+                const cropW = Math.min(DETECTION_SIZE - x1, paddedW);
+                const cropH = Math.min(DETECTION_SIZE - y1, paddedH);
 
                 emCtx.clearRect(0, 0, EMOTION_SIZE, EMOTION_SIZE);
                 emCtx.drawImage(
@@ -121,8 +136,7 @@ async function startLoop() {
                 
                 const emResults = await emotionSession.run({ images: emotionTensor });
                 const rawMood = getTopClass(emResults.output0 as any);
-               
-                //Emotion Mapping 
+
                 let mappedMood = "neutral";
                 if (["happy", "surprise"].includes(rawMood)) mappedMood = "positive";
                 if (["angry", "disgust", "fear", "sad"].includes(rawMood)) mappedMood = "negative";
@@ -130,14 +144,14 @@ async function startLoop() {
                 console.log(`🧠 Inferred mood reading: ${mappedMood} (Raw: ${rawMood})`);
 
                 chrome.runtime.sendMessage({ type: "MOOD_READING", mood: mappedMood })
-                    .catch((e: any) => console.error("❌ Message Send Error from Offscreen:", e.message || e));
+                    .catch((e: any) => console.error("Message Send Error from Offscreen:", e.message || e));
             } else {
                 console.log("No person detected in frame for interval.");
             }
             
             bitmap.close(); 
         } catch (err: any) {
-            console.error("❌ Inference Pipeline Error:", err.message || err);
+            console.error("Inference Pipeline Error:", err.message || err);
         }
     };
 
@@ -158,6 +172,9 @@ chrome.runtime.onMessage.addListener((msg) => {
         if (audioPlayer && !audioPlayer.paused) {
             audioPlayer.pause();
         }
+    } else if (msg.type === "SET_PAUSE_INFERENCE") {
+        isPaused = msg.isPaused;
+        console.log(`[Offscreen] Inference Paused State: ${isPaused}`);
     }
 });
 
