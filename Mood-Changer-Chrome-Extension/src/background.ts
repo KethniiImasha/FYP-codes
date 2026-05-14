@@ -1,4 +1,4 @@
-// Error Logging
+// Error Logging 
 self.addEventListener("error", (e) => {
     console.error("[EmoUI Background Error]", e.error || e.message);
 });
@@ -93,7 +93,7 @@ chrome.storage.local.get(["detectionInterval", "musicEnabled", "quoteLanguage", 
     }
 });
 
-// React to settings changes in real-time
+// React to settings changes in real-time 
 chrome.storage.onChanged.addListener((changes, area) => {
     if (area !== 'local') return;
 
@@ -121,7 +121,7 @@ chrome.storage.onChanged.addListener((changes, area) => {
     }
 });
 
-// SINGLE unified message handler
+// SINGLE unified message handler 
 chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
     if (msg.type === "MOOD_READING") {
         if (isMusicPlaying || isNotificationPending) return; // Skip if paused
@@ -142,6 +142,15 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
         currentMood = "neutral";
         currentQuote = "";
         updatePauseState();
+        // Immediately broadcast current mood to all tabs so content scripts
+        // can apply the overlay without requiring a reload.
+        try {
+            sendMoodToAllTabs();
+            // Also send a runtime message in case some listeners expect it
+            chrome.runtime.sendMessage({ type: "MOOD", mood: currentMood, quote: currentQuote }).catch(() => {});
+        } catch (e) {
+            console.error('[Background] Error broadcasting mood on start:', e);
+        }
     } else if (msg.type === "STOP_EXTENSION") {
         console.log("[Background] STOP_EXTENSION received");
         isRunning = false;
@@ -164,7 +173,7 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
     }
 });
 
-// OpenAI API
+// OpenAI API 
 async function fetchOpenAIQuote(mood: string, lang: string): Promise<string> {
     if (!openaiApiKey) return "";
     try {
@@ -203,7 +212,7 @@ async function fetchOpenAIQuote(mood: string, lang: string): Promise<string> {
     }
 }
 
-// Core mood processing 
+// Core mood processing
 async function processInterval() {
     if (moodReadings.length === 0) return;
 
@@ -348,11 +357,11 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     }
 });
 
-// Broadcast mood to ALL currently open tabs 
+// Broadcast mood to ALL currently open tabs
 function sendMoodToAllTabs() {
     chrome.tabs.query({}, (tabs) => {
         for (const tab of tabs) {
-            if (tab.id && tab.url && !tab.url.startsWith("chrome://")) {
+            if (tab.id && (!tab.url || !tab.url.startsWith("chrome://"))) {
                 chrome.tabs.sendMessage(tab.id, { type: "MOOD", mood: currentMood, quote: currentQuote }).catch(() => {});
             }
         }

@@ -5,7 +5,7 @@
   "icons": {
     "128": "icon128.png"
   },
-  "permissions": ["offscreen", "notifications", "storage"],
+  "permissions": ["offscreen", "notifications", "storage", "tabs"],
   "action": { "default_popup": "index.html" },
   "background": { "service_worker": "assets/background.js" },
   "content_scripts": [

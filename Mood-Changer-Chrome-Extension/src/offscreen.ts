@@ -136,7 +136,9 @@ async function startLoop() {
                 
                 const emResults = await emotionSession.run({ images: emotionTensor });
                 const rawMood = getTopClass(emResults.output0 as any);
-
+                
+                //Emotion mapping
+                
                 let mappedMood = "neutral";
                 if (["happy", "surprise"].includes(rawMood)) mappedMood = "positive";
                 if (["angry", "disgust", "fear", "sad"].includes(rawMood)) mappedMood = "negative";
